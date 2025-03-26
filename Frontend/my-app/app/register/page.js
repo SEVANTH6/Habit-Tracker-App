@@ -1,14 +1,28 @@
 "use client";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import Link from "next/link";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
-export default function RegisterPage() {
+// Validation Schema
+const schema = yup.object().shape({
+  email: yup.string().email("Invalid email format").required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .matches(/[A-Z]/, "Must contain at least one uppercase letter")
+    .matches(/\d/, "Must contain at least one number")
+    .required("Password is required"),
+});
+
+export default function RegisterForm() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   const [message, setMessage] = useState("");
 
@@ -22,7 +36,7 @@ export default function RegisterPage() {
 
       const result = await response.json();
       if (response.ok) {
-        setMessage("Registration successful! Please log in.");
+        setMessage("Registration successful!");
       } else {
         setMessage(result.error || "Something went wrong!");
       }
@@ -32,60 +46,33 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
-      {/* Navbar */}
-      <nav className="w-full bg-blue-600 text-white py-4 px-8 flex justify-between items-center shadow-md">
-        <h1 className="text-2xl font-bold">Habit Tracker</h1>
-        <Link href="/signin" className="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-gray-200">
-          Login
-        </Link>
-      </nav>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-lg shadow-md w-96">
+        <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
 
-      {/* Registration Form */}
-      <div className="flex flex-col justify-center items-center flex-grow text-center px-6">
-        <div className="bg-white p-6 rounded-lg shadow-md w-96">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Register</h2>
+        {/* Email Input */}
+        <label className="block mb-2">Email</label>
+        <input type="email" {...register("email")} className="w-full p-2 border rounded" />
+        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <label className="block mb-2 text-gray-700">Email</label>
-            <input
-              type="email"
-              {...register("email", { required: "Email is required" })}
-              className="w-full p-2 border rounded"
-            />
-            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+        {/* Password Input */}
+        <label className="block mt-4 mb-2">Password</label>
+        <input type="password" {...register("password")} className="w-full p-2 border rounded" />
+        {errors.password && <p className="text-red-500">{errors.password.message}</p>}
 
-            <label className="block mt-4 mb-2 text-gray-700">Password</label>
-            <input
-              type="password"
-              {...register("password", { required: "Password is required", minLength: { value: 6, message: "At least 6 characters" } })}
-              className="w-full p-2 border rounded"
-            />
-            {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+        {/* Submit Button */}
+        <button type="submit" className="w-full bg-blue-500 text-white p-2 mt-4 rounded hover:bg-blue-600">
+          Register
+        </button>
 
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white p-2 mt-4 rounded hover:bg-blue-600"
-            >
-              Register
-            </button>
-          </form>
+        {/* Message Display */}
+        {message && <p className="mt-4 text-center text-gray-700">{message}</p>}
 
-          {message && <p className="mt-4 text-gray-700">{message}</p>}
-
-          <p className="mt-4 text-gray-700">
-            Already have an account?{" "}
-            <Link href="/signin" className="text-blue-600 hover:underline">
-              Sign In
-            </Link>
-          </p>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="w-full py-4 bg-gray-200 text-center text-gray-600">
-        © 2025 Habit Tracker | Stay Consistent, Stay Motivated
-      </footer>
+        {/* Login Link */}
+        <p className="mt-4 text-center">
+          Already have an account? <a href="/signin" className="text-blue-600 underline">Sign in</a>
+        </p>
+      </form>
     </div>
   );
 }
