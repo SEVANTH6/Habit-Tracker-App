@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -20,6 +21,7 @@ export default function SignInForm() {
   });
 
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const onSubmit = async (data) => {
     try {
@@ -31,8 +33,9 @@ export default function SignInForm() {
 
       const result = await response.json();
       if (response.ok) {
+        localStorage.setItem("email", data.email);  // Store email
         setMessage("Login successful!");
-        window.location.href = "/dashboard"; // Redirect to dashboard
+        router.push("/tracking");  // Redirect to tracking page
       } else {
         setMessage(result.error || "Invalid credentials!");
       }
