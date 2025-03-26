@@ -37,6 +37,24 @@ def register():
 
     return jsonify({'message': 'User registered successfully', 'created_at': new_user.created_at}), 201
 
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    if not data or not all(key in data for key in ['email', 'password']):
+        return jsonify({'error': 'Missing email or password'}), 400
+
+    user = User.query.filter_by(email=data['email']).first()
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    if not bcrypt.check_password_hash(user.password, data['password']):
+        return jsonify({'error': 'Invalid credentials'}), 401
+
+    return jsonify({'message': 'Login successful', 'email': user.email, 'created_at': user.created_at}), 200
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
