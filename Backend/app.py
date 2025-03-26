@@ -40,6 +40,10 @@ def register():
 
 
 
+@app.route('/habits', methods=['POST'])
+def habit():
+    return "Hello Wait happening"
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
