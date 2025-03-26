@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
@@ -7,6 +8,7 @@ export default function SignInPage() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const onSubmit = async (data) => {
     try {
@@ -18,8 +20,7 @@ export default function SignInPage() {
 
       const result = await response.json();
       if (response.ok) {
-        setMessage("Login successful! Redirecting...");
-        setTimeout(() => router.push("/dashboard"), 2000);
+
       } else {
         setMessage(result.error);
       }
