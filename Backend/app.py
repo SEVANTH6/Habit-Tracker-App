@@ -59,6 +59,10 @@ def login():
 
     return jsonify({'message': 'Login successful!', 'email': user.email, 'created_at': user.created_at}), 200
 
+@app.route('/habits', methods=['POST'])
+def habit():
+    return "Hello Wait happening"
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
